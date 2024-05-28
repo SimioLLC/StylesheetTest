@@ -1,0 +1,2382 @@
+<Processes>
+  <Process Name="AddResourceReservation" BeginStepID="8" Category="Complex Look Aheads">
+    <Properties>
+      <Property Name="ReportStatistics">False</Property>
+      <Property Name="TokenClassName">CheckToken</Property>
+      <Property Name="InputArguments">
+        <Rows>
+          <Properties>
+            <Property Name="InputArgumentName">IsPrimary</Property>
+            <Property Name="InputArgumentStateVariableName">
+              <Value>CheckToken.IsPrimary</Value>
+            </Property>
+          </Properties>
+        </Rows>
+      </Property>
+    </Properties>
+    <Steps>
+      <Step Type="Assign" Name="TimeNow" ID="2">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>ResourceReservations.TimeNow</Value>
+          </Property>
+          <Property Name="NewValue">TimeNow</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="3" />
+      </Step>
+      <Step Type="Assign" Name="TransferNode" ID="3">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>ResourceReservations.TransferNode</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.TransferNode</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="4" />
+      </Step>
+      <Step Type="Assign" Name="Resource" ID="4">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>ResourceReservations.Resource</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.Resource</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="10" />
+      </Step>
+      <Step Type="Assign" Name="OrderId" ID="5">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>ResourceReservations.OrderId</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.OrderId</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="11" />
+      </Step>
+      <Step Type="Assign" Name="ReserveStartTime" ID="6">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>ResourceReservations.ReserveStartTime</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.ReserveStartTime</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="7" />
+      </Step>
+      <Step Type="Assign" Name="ReserveEndTime" ID="7">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>ResourceReservations.ReserveEndTime</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.ReserveEndTime</Property>
+        </Properties>
+      </Step>
+      <Step Type="AddRow" Name="ResourceReservations" ID="8">
+        <Properties>
+          <Property Name="ObjectType">Token</Property>
+          <Property Name="TableName">ResourceReservations</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="2" />
+      </Step>
+      <Step Type="Assign" Name="RoutingKey" ID="9">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>ResourceReservations.RoutingKey</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.RoutingKey</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="6" />
+      </Step>
+      <Step Type="Assign" Name="IsPrimary" ID="10">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>ResourceReservations.IsPrimary</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.IsPrimary</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="5" />
+      </Step>
+      <Step Type="Assign" Name="StartingRoutingKey" ID="11">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>ResourceReservations.StartingRoutingKey</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.StartingRoutingKey</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="9" />
+      </Step>
+    </Steps>
+  </Process>
+  <Process Name="CheckDownsteamResourceAvailablity" BeginStepID="6" Category="Complex Look Aheads">
+    <Properties>
+      <Property Name="ReportStatistics">False</Property>
+      <Property Name="TokenClassName">CheckToken</Property>
+      <Property Name="ReturnValues">
+        <Rows>
+          <Properties>
+            <Property Name="ReturnValueName">IsAvailable</Property>
+            <Property Name="ReturnValueExpression">CheckToken.CurrentEntity.ModelEntity.SuccessorsAvailable</Property>
+          </Properties>
+        </Rows>
+      </Property>
+    </Properties>
+    <Steps>
+      <Step Type="Search" Name="Routings" ID="2">
+        <Properties>
+          <Property Name="CollectionType">TableRows</Property>
+          <Property Name="EntityType">WIPEntity</Property>
+          <Property Name="TableName">Routings</Property>
+          <Property Name="MatchCondition">Routings.RoutingNumber == CheckToken.SuccessorRoutingNumber</Property>
+          <Property Name="Limit">Infinity</Property>
+          <Property Name="SaveNumberFound">
+            <Value>ModelEntity.NumberOfSuccesors</Value>
+          </Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="5" />
+        <Exit Name="Found" Type="Alternate" NextID="8" />
+      </Step>
+      <Step Type="Assign" Name="SuccessorsAvailable" ID="3">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentEntity.ModelEntity.SuccessorsAvailable</Value>
+          </Property>
+          <Property Name="NewValue">False</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="2" />
+      </Step>
+      <Step Type="Assign" Name="SuccessorsAvailable" ID="4">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentEntity.ModelEntity.SuccessorsAvailable</Value>
+          </Property>
+          <Property Name="NewValue">True</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="36" />
+      </Step>
+      <Step Type="Decide" Name="NumberOfSuccesors== 0" ID="5">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">ModelEntity.NumberOfSuccesors== 0</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="4" />
+      </Step>
+      <Step Type="Assign" Name="CurrentLevel" ID="6">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentLevel</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.CurrentLevel + 1</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="3" />
+      </Step>
+      <Step Type="Assign" Name="UpstreamProcessingTime" ID="7">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.UpstreamProcessingTime</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.UpstreamProcessingTime + Routings.StartOffset </Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="15" />
+      </Step>
+      <Step Type="Assign" Name="TransferNode" ID="8">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.TransferNode</Value>
+          </Property>
+          <Property Name="NewValue">Routings.Sequence</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="9" />
+      </Step>
+      <Step Type="Assign" Name="RoutingKey" ID="9">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.RoutingKey</Value>
+          </Property>
+          <Property Name="NewValue">Routings.RoutingKey</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="10" />
+      </Step>
+      <Step Type="Assign" Name="RoutingNumber" ID="10">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.RoutingNumber</Value>
+          </Property>
+          <Property Name="NewValue">Routings.RoutingNumber</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="11" />
+      </Step>
+      <Step Type="Assign" Name="SuccessorRoutingNumber" ID="11">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.SuccessorRoutingNumber</Value>
+          </Property>
+          <Property Name="NewValue">Routings.SuccessorRoutingNumber</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="12" />
+      </Step>
+      <Step Type="Assign" Name="CurrentSequenceProcessingTime" ID="12">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentSequenceProcessingTime</Value>
+          </Property>
+          <Property Name="NewValue">ManufacturingOrders.Quantity * Routings.ProcessTime</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="13" />
+      </Step>
+      <Step Type="Assign" Name="ReserveStartTime" ID="13">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.ReserveStartTime</Value>
+          </Property>
+          <Property Name="NewValue">TimeNow + CheckToken.UpstreamProcessingTime</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="14" />
+      </Step>
+      <Step Type="Assign" Name="ReserveEndTime" ID="14">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.ReserveEndTime</Value>
+          </Property>
+          <Property Name="NewValue">TimeNow + CheckToken.CurrentSequenceProcessingTime + CheckToken.UpstreamProcessingTime</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="38" />
+      </Step>
+      <Step Type="Search" Name="Resources" ID="15">
+        <Properties>
+          <Property Name="CollectionType">TableRows</Property>
+          <Property Name="EntityType">WIPEntity</Property>
+          <Property Name="TableName">Resources</Property>
+          <Property Name="MatchCondition">Resources.ResourceName == CheckToken.TransferNode</Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="33" />
+        <Exit Name="Found" Type="Alternate" NextID="16" />
+      </Step>
+      <Step Type="Decide" Name="Is.TransferNode" ID="16">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">Resources.ResourceName.Is.TransferNode == True</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="17" />
+      </Step>
+      <Step Type="Assign" Name="F ResourceFound" ID="17">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>ModelEntity.ResourceFound</Value>
+          </Property>
+          <Property Name="NewValue">False</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="18" />
+      </Step>
+      <Step Type="Search" Name="Resources.NodeList" ID="18">
+        <Properties>
+          <Property Name="CollectionType">NodeList</Property>
+          <Property Name="EntityType">WIPEntity</Property>
+          <Property Name="NodeListName">Resources.NodeList</Property>
+          <Property Name="Limit">Infinity</Property>
+        </Properties>
+        <Exit Name="Found" Type="Alternate" NextID="19" />
+      </Step>
+      <Step Type="Assign" Name="Resource" ID="19">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.Resource</Value>
+          </Property>
+          <Property Name="NewValue">Node.AssociatedObject</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="20" />
+      </Step>
+      <Step Type="Decide" Name="Resource Found" ID="20">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.CurrentEntity.ModelEntity.ResourceFound == True</Property>
+        </Properties>
+        <Exit Name="False" Type="Alternate" NextID="21" />
+      </Step>
+      <Step Type="Decide" Name="Capacity.Initial &gt; 0" ID="21">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.Resource.Server.Capacity.Initial &gt; 0</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="22" />
+      </Step>
+      <Step Type="Search" Name="ResourceReservations" ID="22">
+        <Properties>
+          <Property Name="CollectionType">TableRows</Property>
+          <Property Name="EntityType">WIPEntity</Property>
+          <Property Name="QueueStateName">
+            <Value>ResourceReservationsStorage.Queue</Value>
+          </Property>
+          <Property Name="TableName">ResourceReservations</Property>
+          <Property Name="SearchType">MaximizeExpression</Property>
+          <Property Name="MatchCondition">ResourceReservations.Resource == CheckToken.Resource &amp;&amp; ((CheckToken.ReserveStartTime &lt;= ResourceReservations.ReserveStartTime &amp;&amp; CheckToken.ReserveEndTime &gt;= ResourceReservations.ReserveEndTime) || (CheckToken.ReserveStartTime &gt;= ResourceReservations.ReserveStartTime &amp;&amp; CheckToken.ReserveStartTime &lt; ResourceReservations.ReserveEndTime) || (CheckToken.ReserveEndTime &gt; ResourceReservations.ReserveStartTime &amp;&amp; CheckToken.ReserveEndTime &lt;= ResourceReservations.ReserveEndTime))</Property>
+          <Property Name="SearchExpression">ResourceReservations.ReserveEndTime</Property>
+          <Property Name="SaveNumberFound">
+            <Value>CheckToken.NumberOfRows</Value>
+          </Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="23" />
+      </Step>
+      <Step Type="Decide" Name="Others have no res" ID="23">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.NumberOfRows &lt; CheckToken.Resource.Server.CurrentCapacity</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="24" />
+        <Exit Name="False" Type="Alternate" NextID="35" />
+      </Step>
+      <Step Type="Execute" Name="CheckSecondaryResources" Color="c0ffc0" ID="24">
+        <Properties>
+          <Property Name="ProcessName">
+            <Value>CheckSecondaryResources</Value>
+            <InputParameters>
+              <Properties>
+                <Property Name="ReserveStartTime">CheckToken.ReserveStartTime</Property>
+                <Property Name="ReserveEndTime">CheckToken.ReserveEndTime</Property>
+                <Property Name="ReasonCode">1</Property>
+              </Properties>
+            </InputParameters>
+            <ReturnedValues>
+              <Properties>
+                <Property Name="ReturnValue">
+                  <Value>CheckToken.ReturnValue</Value>
+                </Property>
+                <Property Name="EventDelayTime">
+                  <Value>CheckToken.EventDelayTime</Value>
+                </Property>
+                <Property Name="ReasonCode">
+                  <Value>CheckToken.ReasonCode</Value>
+                </Property>
+                <Property Name="IsPrimary">
+                  <Value>CheckToken.IsPrimary</Value>
+                </Property>
+                <Property Name="EventDelayResource">
+                  <Value>CheckToken.EventDelayResource</Value>
+                </Property>
+              </Properties>
+            </ReturnedValues>
+          </Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="25" />
+      </Step>
+      <Step Type="Decide" Name="T ReturnValue" ID="25">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.ReturnValue == True</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="26" />
+        <Exit Name="False" Type="Alternate" NextID="29" />
+      </Step>
+      <Step Type="Execute" Name="AddResourceReservation" Color="ff8000" ID="26">
+        <Properties>
+          <Property Name="ProcessName">
+            <Value>AddResourceReservation</Value>
+            <InputParameters>
+              <Properties>
+                <Property Name="IsPrimary">True</Property>
+              </Properties>
+            </InputParameters>
+          </Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="27" />
+      </Step>
+      <Step Type="Assign" Name="T ResourceFound" ID="27">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>ModelEntity.ResourceFound</Value>
+          </Property>
+          <Property Name="NewValue">True</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="28" />
+      </Step>
+      <Step Type="Assign" Name="T SuccessorsAvailable" ID="28">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentEntity.ModelEntity.SuccessorsAvailable</Value>
+          </Property>
+          <Property Name="NewValue">True</Property>
+        </Properties>
+      </Step>
+      <Step Type="Decide" Name="EventDelayTime &gt; 0" ID="29">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.EventDelayTime &gt; 0</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="30" />
+        <Exit Name="False" Type="Alternate" NextID="26" />
+      </Step>
+      <Step Type="Assign" Name="EventDelayResource" ID="30">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.EventDelayResource</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.Resource</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="31" />
+      </Step>
+      <Step Type="Assign" Name="0 ReasonCode" ID="31">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.ReasonCode</Value>
+          </Property>
+          <Property Name="NewValue">0</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="32" />
+      </Step>
+      <Step Type="Execute" Name="ScheduleFutureTriggerRoutingGroupTrigger" Color="ff00ff" ID="32">
+        <Properties>
+          <Property Name="ProcessName">
+            <Value>ScheduleFutureTriggerRoutingGroupTrigger</Value>
+            <InputParameters>
+              <Properties>
+                <Property Name="IsPrimary">True</Property>
+              </Properties>
+            </InputParameters>
+          </Property>
+          <Property Name="TokenWaitAction">None (Continue)</Property>
+        </Properties>
+      </Step>
+      <Step Type="Decide" Name="SuccessorsAvailable == True" ID="33">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">ModelEntity.SuccessorsAvailable == True</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="34" />
+      </Step>
+      <Step Type="Execute" Name="CheckDownsteamResourceAvailablity" Color="00ff00" ID="34">
+        <Properties>
+          <Property Name="ProcessName">
+            <Value>CheckDownsteamResourceAvailablity</Value>
+            <ReturnedValues>
+              <Properties>
+                <Property Name="IsAvailable">
+                  <Value>CheckToken.ReturnValue</Value>
+                </Property>
+              </Properties>
+            </ReturnedValues>
+          </Property>
+        </Properties>
+      </Step>
+      <Step Type="Assign" Name="EventDelayTime" Description="EventDelayTime" ID="35">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.EventDelayTime</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.ReturnValue - TimeNow</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="29" />
+      </Step>
+      <Step Type="Assign" Name="CurrentEquipmentGroup" ID="36">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>StartingTransferNode</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.StartingTransferNode</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="37" />
+      </Step>
+      <Step Type="Fire" Name="TriggerRoutingGroup" ID="37">
+        <Properties>
+          <Property Name="EventName">TriggerRoutingGroup</Property>
+        </Properties>
+      </Step>
+      <Step Type="Decide" Name="StartOffset &gt; 0" ID="38">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">Routings.StartOffset &gt; 0</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="7" />
+        <Exit Name="False" Type="Alternate" NextID="39" />
+      </Step>
+      <Step Type="Assign" Name="UpstreamProcessingTime" ID="39">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.UpstreamProcessingTime</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.UpstreamProcessingTime + CheckToken.CurrentSequenceProcessingTime</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="15" />
+      </Step>
+    </Steps>
+  </Process>
+  <Process Name="ScheduleFutureTriggerRoutingGroupTrigger" BeginStepID="8" Category="Complex Look Aheads">
+    <Properties>
+      <Property Name="ReportStatistics">False</Property>
+      <Property Name="TokenClassName">CheckToken</Property>
+      <Property Name="InputArguments">
+        <Rows>
+          <Properties>
+            <Property Name="InputArgumentName">IsPrimary</Property>
+            <Property Name="InputArgumentStateVariableName">
+              <Value>CheckToken.IsPrimary</Value>
+            </Property>
+          </Properties>
+        </Rows>
+      </Property>
+    </Properties>
+    <Steps>
+      <Step Type="Fire" Name="TriggerRoutingGroup" ID="2">
+        <Properties>
+          <Property Name="EventName">TriggerRoutingGroup</Property>
+        </Properties>
+      </Step>
+      <Step Type="Assign" Name="StartingTransferNode" ID="3">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>StartingTransferNode</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.StartingTransferNode</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="2" />
+      </Step>
+      <Step Type="Decide" Name="NumberOfRows == 0" ID="4">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.NumberOfRows == 0</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="14" />
+      </Step>
+      <Step Type="Decide" Name="EventDelayTime &gt; UpstreamProcessingTime" ID="5">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.EventDelayTime &gt; CheckToken.UpstreamProcessingTime</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="6" />
+        <Exit Name="False" Type="Alternate" NextID="7" />
+      </Step>
+      <Step Type="Assign" Name="EventTime" ID="6">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.EventTime</Value>
+          </Property>
+          <Property Name="NewValue">Math.Round(((CheckToken.EventDelayTime - CheckToken.UpstreamProcessingTime) + TimeNow) * 1000) / 1000</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="13" />
+      </Step>
+      <Step Type="Assign" Name="EventTime" ID="7">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.EventTime</Value>
+          </Property>
+          <Property Name="NewValue">Math.Round((CheckToken.EventDelayTime + TimeNow) * 1000) / 1000</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="13" />
+      </Step>
+      <Step Type="Decide" Name="ReasonCode != 8" ID="8">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.ReasonCode != 8</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="10" />
+        <Exit Name="False" Type="Alternate" NextID="7" />
+      </Step>
+      <Step Type="Delay" Name="DelayTime" ID="9">
+        <Properties>
+          <Property Name="DelayTime">CheckToken.EventDelayTime</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="3" />
+      </Step>
+      <Step Type="Decide" Name="EventDelayTime &lt; 1" ID="10">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.EventDelayTime &lt; 1</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="5" />
+        <Exit Name="False" Type="Alternate" NextID="11" />
+      </Step>
+      <Step Type="Assign" Name="EventDelayTime" Description="Next Top Of Hour" ID="11">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.EventDelayTime</Value>
+          </Property>
+          <Property Name="NewValue">Math.Ceiling( TimeNow + 0.001 ) - TimeNow</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="12" />
+      </Step>
+      <Step Type="Assign" Name="EventTime" ID="12">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.EventTime</Value>
+          </Property>
+          <Property Name="NewValue">Math.Round((CheckToken.EventDelayTime + TimeNow) * 1000) / 1000</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="13" />
+      </Step>
+      <Step Type="Search" Name="GroupEvent" ID="13">
+        <Properties>
+          <Property Name="CollectionType">TableRows</Property>
+          <Property Name="EntityType">WIPEntity</Property>
+          <Property Name="QueueStateName">
+            <Value>GroupEventStorage.Queue</Value>
+          </Property>
+          <Property Name="TableName">GroupEvents</Property>
+          <Property Name="MatchCondition">GroupEvents.StartingTransferNode == CheckToken.StartingTransferNode &amp;&amp; GroupEvents.EventTime == CheckToken.EventTime</Property>
+          <Property Name="SaveNumberFound">
+            <Value>CheckToken.NumberOfRows</Value>
+          </Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="4" />
+      </Step>
+      <Step Type="AddRow" Name="GroupEvents" ID="14">
+        <Properties>
+          <Property Name="ObjectType">Token</Property>
+          <Property Name="TableName">GroupEvents</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="18" />
+      </Step>
+      <Step Type="Assign" Name="StartingTransferNode" ID="15">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>GroupEvents.StartingTransferNode</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.StartingTransferNode</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="17" />
+      </Step>
+      <Step Type="Assign" Name="EventTime" ID="16">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>GroupEvents.EventTime</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.EventTime</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="19" />
+      </Step>
+      <Step Type="Assign" Name="TransferNode" ID="17">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>GroupEvents.TransferNode</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.TransferNode</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="16" />
+      </Step>
+      <Step Type="Assign" Name="TimeNow" ID="18">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>GroupEvents.TimeNow</Value>
+          </Property>
+          <Property Name="NewValue">TimeNow</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="15" />
+      </Step>
+      <Step Type="Assign" Name="EventTime" ID="19">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>GroupEvents.EventDelayTime</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.EventDelayTime</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="9" />
+      </Step>
+    </Steps>
+  </Process>
+  <Process Name="Filler_AfterProcessing" BeginStepID="3" Category="Filler">
+    <Properties />
+    <Steps>
+      <Step Type="SetRow" Name="Routings..Dispose" ID="2">
+        <Properties>
+          <Property Name="TableName">Routings</Property>
+          <Property Name="RowNumber">3</Property>
+        </Properties>
+      </Step>
+      <Step Type="Decide" Name="StartOffset &gt; 0" ID="3">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">Routings.StartOffset &gt; 0</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="2" />
+      </Step>
+    </Steps>
+  </Process>
+  <Process Name="FillerConsumeFinishedTask" BeginStepID="2" Category="Filler">
+    <Properties />
+    <Steps>
+      <Step Type="Assign" Name="TankReleaseOrderId" ID="2">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>TankReleaseOrderId</Value>
+          </Property>
+          <Property Name="NewValue">ModelEntity.BulkOrderId</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="3" />
+      </Step>
+      <Step Type="Fire" Name="TankRelease" ID="3">
+        <Properties>
+          <Property Name="EventName">TankRelease</Property>
+        </Properties>
+      </Step>
+    </Steps>
+  </Process>
+  <Process Name="WaitForStartOffset" BeginStepID="4" Category="Filler">
+    <Properties>
+      <Property Name="TokenClassName">WaitToken</Property>
+    </Properties>
+    <Steps>
+      <Step Type="Create" Name="ManufacturingOrderEntity" ID="2">
+        <Properties>
+          <Property Name="CreateType">CopyAssociatedObject</Property>
+          <Property Name="EntityType">ManufacturingOrderEntity</Property>
+          <Property Name="SourceEntityObject">
+            <Value>ModelEntity</Value>
+          </Property>
+        </Properties>
+        <Exit Name="Created" Type="Alternate" NextID="6" />
+      </Step>
+      <Step Type="Assign" Name="Server" ID="3">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>WaitToken.Server</Value>
+          </Property>
+          <Property Name="NewValue">Server</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="2" />
+      </Step>
+      <Step Type="Decide" Name="StartOffset &gt; 0" ID="4">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">Routings.StartOffset &gt; 0</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="3" />
+      </Step>
+      <Step Type="Delay" Name="Routings.StartOffset " ID="5">
+        <Properties>
+          <Property Name="DelayTime">Routings.StartOffset</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="7" />
+      </Step>
+      <Step Type="SetRow" Name="Routings" ID="6">
+        <Properties>
+          <Property Name="TableName">Routings</Property>
+          <Property Name="RowNumber">1</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="5" />
+      </Step>
+      <Step Type="Transfer" Name="Output" ID="7">
+        <Properties>
+          <Property Name="NodeName">WaitToken.Server.Server.Output</Property>
+        </Properties>
+      </Step>
+    </Steps>
+  </Process>
+  <Process Name="ForkLift_Unloaded" BeginStepID="3" Category="ForkLift">
+    <Properties />
+    <Steps>
+      <Step Type="Decide" Name="Is.ManufacturingOrderArrival" ID="2">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">Is.ManufacturingOrderArrival</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="4" />
+      </Step>
+      <Step Type="Produce" Name="ManufacturingOrders.MaterialName" ID="3">
+        <Properties>
+          <Property Name="MaterialName">
+            <Value>Materials.MaterialName</Value>
+          </Property>
+          <Property Name="Quantity">ManufacturingOrders.Quantity</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="2" />
+      </Step>
+      <Step Type="Tally" Name="Lateness" ID="4">
+        <Properties>
+          <Property Name="TallyStatisticName">
+            <Value>Lateness</Value>
+          </Property>
+          <Property Name="Value">TimeNow - ManufacturingOrders.DueDate</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="5" />
+      </Step>
+      <Step Type="Tally" Name="TimeInSystem" ID="5">
+        <Properties>
+          <Property Name="TallyStatisticName">
+            <Value>TimeInSystem</Value>
+          </Property>
+          <Property Name="Value">TimeNow - ManufacturingOrders.ReleaseDate</Property>
+        </Properties>
+      </Step>
+    </Steps>
+  </Process>
+  <Process Name="OnRunInitialized" IsOverride="True" ShowAsUserExecutableProcess="False" InterfaceProcessID="Object.OnRunInitialized" BeginStepID="2" Category="Initialize">
+    <Properties />
+    <Steps>
+      <Step Type="Execute" Name="PopulateDepAndReq" ID="2">
+        <Properties>
+          <Property Name="ProcessName">
+            <Value>OnRunInitialized_FreezeSchedule</Value>
+          </Property>
+        </Properties>
+      </Step>
+    </Steps>
+  </Process>
+  <Process Name="OnRunInitialized_FreezeSchedule" BeginStepID="30" Category="Initialize">
+    <Properties>
+      <Property Name="TokenClassName">FreezeScheduleToken</Property>
+    </Properties>
+    <Steps>
+      <Step Type="Search" Name="LastSchedule" ID="2">
+        <Properties>
+          <Property Name="CollectionType">TableRows</Property>
+          <Property Name="TableName">PublishedSchedule</Property>
+          <Property Name="SearchType">MinimizeExpression</Property>
+          <Property Name="MatchCondition">FreezeScheduleToken.ResourceObj.Name == PublishedSchedule.ScheduledResource &amp;&amp; PublishedSchedule.ScheduledStartTime &lt;= Run.FreezePeriod</Property>
+          <Property Name="SearchExpression">PublishedSchedule.ScheduledStartTime</Property>
+          <Property Name="Limit">Infinity</Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="36" />
+        <Exit Name="Found" Type="Alternate" NextID="18" />
+      </Step>
+      <Step Type="AddRow" Name="ListRequirements" ID="3">
+        <Properties>
+          <Property Name="TableName">FreezeListRequirements</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="21" />
+      </Step>
+      <Step Type="Assign" Name="NodeList" ID="4">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeListRequirements.NodeList</Value>
+          </Property>
+          <Property Name="NewValue">FreezeScheduleToken.NodeListRef</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="5" />
+      </Step>
+      <Step Type="Assign" Name="RequiredNode" ID="5">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeListRequirements.RequiredNode</Value>
+          </Property>
+          <Property Name="NewValue">FreezeScheduleToken.ResourceObj.Server.Input</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="8" />
+      </Step>
+      <Step Type="Search" Name="WorkInProcess" ID="6">
+        <Properties>
+          <Property Name="CollectionType">TableRows</Property>
+          <Property Name="TableName">WorkInProcess</Property>
+          <Property Name="SearchType">MinimizeExpression</Property>
+          <Property Name="MatchCondition">WorkInProcess.OrderId == FreezeScheduleToken.CandidateEntityName &amp;&amp; String.FromDateTime( FreezeScheduleToken.ReturnValue ) &lt;= WorkInProcess.CurrentRoutingNumber</Property>
+          <Property Name="SearchExpression"></Property>
+          <Property Name="Limit">Infinity</Property>
+          <Property Name="SaveNumberFound">
+            <Value>FreezeScheduleToken.NumberFound</Value>
+          </Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="20" />
+      </Step>
+      <Step Type="Assign" Name="ObjectRef" ID="7">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeScheduleToken.ResourceObj</Value>
+          </Property>
+          <Property Name="NewValue">Resources.ResourceName</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="17" />
+      </Step>
+      <Step Type="Decide" Name="RowNumber &gt; 1" ID="8">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">RowNumber &gt; 1</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="22" />
+        <Exit Name="False" Type="Alternate" NextID="10" />
+      </Step>
+      <Step Type="AddRow" Name="RoutingDependencies" ID="9">
+        <Properties>
+          <Property Name="TableName">FreezeRoutingDependencies</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="15" />
+      </Step>
+      <Step Type="Assign" Name="LastFrozenEntityName" ID="10">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>LastFrozenEntityName</Value>
+          </Property>
+          <Property Name="NewValue">FreezeScheduleToken.CandidateEntityName</Property>
+        </Properties>
+      </Step>
+      <Step Type="Assign" Name="LastFrozenEntityString" ID="11">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>LastFrozenEntityName</Value>
+          </Property>
+          <Property Name="NewValue">""</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="7" />
+      </Step>
+      <Step Type="Assign" Name="CandidateEntityName" ID="12">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeRoutingDependencies.CandidateEntityName</Value>
+          </Property>
+          <Property Name="NewValue">FreezeScheduleToken.CandidateEntityName</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="13" />
+      </Step>
+      <Step Type="Assign" Name="FollowsEntityName" ID="13">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeRoutingDependencies.FollowsEntityName</Value>
+          </Property>
+          <Property Name="NewValue">LastFrozenEntityName</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="14" />
+      </Step>
+      <Step Type="Assign" Name="PriorUsageCount" ID="14">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeRoutingDependencies.PriorUsageCount</Value>
+          </Property>
+          <Property Name="NewValue">1</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="23" />
+      </Step>
+      <Step Type="Assign" Name="NodeList" ID="15">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeRoutingDependencies.NodeList</Value>
+          </Property>
+          <Property Name="NewValue">FreezeScheduleToken.NodeListRef</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="12" />
+      </Step>
+      <Step Type="Assign" Name="RowNumber" ID="16">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>RowNumber</Value>
+          </Property>
+          <Property Name="NewValue">0</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="11" />
+      </Step>
+      <Step Type="Assign" Name="RowNumber" ID="17">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>RowNumber</Value>
+          </Property>
+          <Property Name="NewValue">0</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="34" />
+      </Step>
+      <Step Type="Assign" Name="CandidateEntityName" ID="18">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeScheduleToken.CandidateEntityName</Value>
+          </Property>
+          <Property Name="NewValue">PublishedSchedule.OrderId</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="39" />
+      </Step>
+      <Step Type="Assign" Name="RowNumber" ID="19">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>RowNumber</Value>
+          </Property>
+          <Property Name="NewValue">RowNumber + 1</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="3" />
+      </Step>
+      <Step Type="Decide" Name="NumberFound ==0" ID="20">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">FreezeScheduleToken.NumberFound == 0</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="19" />
+      </Step>
+      <Step Type="Assign" Name="CandidateEntityName" ID="21">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeListRequirements.CandidateEntityName</Value>
+          </Property>
+          <Property Name="NewValue">FreezeScheduleToken.CandidateEntityName</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="4" />
+      </Step>
+      <Step Type="Decide" Name="LastFrozenEntity != MyToken1.CandidateEntity" ID="22">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">LastFrozenEntityName != FreezeScheduleToken.CandidateEntityName</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="9" />
+      </Step>
+      <Step Type="Assign" Name="Resource" ID="23">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeRoutingDependencies.FreezeResource</Value>
+          </Property>
+          <Property Name="NewValue">FreezeScheduleToken.ResourceObj</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="10" />
+      </Step>
+      <Step Type="AddRow" Name="RoutingDependencies" ID="24">
+        <Properties>
+          <Property Name="TableName">FreezeRoutingDependencies</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="25" />
+      </Step>
+      <Step Type="Assign" Name="NodeList" ID="25">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeRoutingDependencies.NodeList</Value>
+          </Property>
+          <Property Name="NewValue">FreezeScheduleToken.NodeListRef</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="26" />
+      </Step>
+      <Step Type="Assign" Name="FollowsEntityName" ID="26">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeRoutingDependencies.FollowsEntityName</Value>
+          </Property>
+          <Property Name="NewValue">LastFrozenEntityName</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="27" />
+      </Step>
+      <Step Type="Assign" Name="CandidateEntityName" ID="27">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeRoutingDependencies.CandidateEntityName</Value>
+          </Property>
+          <Property Name="NewValue">"*"</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="28" />
+      </Step>
+      <Step Type="Assign" Name="PriorUsageCount" ID="28">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeRoutingDependencies.PriorUsageCount</Value>
+          </Property>
+          <Property Name="NewValue">1</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="29" />
+      </Step>
+      <Step Type="Assign" Name="Resource" ID="29">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeRoutingDependencies.FreezeResource</Value>
+          </Property>
+          <Property Name="NewValue">FreezeScheduleToken.ResourceObj</Property>
+        </Properties>
+      </Step>
+      <Step Type="Search" Name="TransferNodes" ID="30">
+        <Properties>
+          <Property Name="CollectionType">TableRows</Property>
+          <Property Name="TableName">Resources</Property>
+          <Property Name="MatchCondition">Resources.ObjectType == List.ObjectType.TransferNode</Property>
+          <Property Name="Limit">Infinity</Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="40" />
+        <Exit Name="Found" Type="Alternate" NextID="32" />
+      </Step>
+      <Step Type="Search" Name="Resources" ID="31">
+        <Properties>
+          <Property Name="CollectionType">TableRows</Property>
+          <Property Name="TableName">Resources</Property>
+          <Property Name="MatchCondition">Resources.ParentResourceName == FreezeScheduleToken.ResourceObj.Name</Property>
+          <Property Name="Limit">Infinity</Property>
+        </Properties>
+        <Exit Name="Found" Type="Alternate" NextID="16" />
+      </Step>
+      <Step Type="Assign" Name="NodeListRef" ID="32">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeScheduleToken.NodeListRef</Value>
+          </Property>
+          <Property Name="NewValue">Resources.NodeList</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="33" />
+      </Step>
+      <Step Type="Assign" Name="ResourceObj" ID="33">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeScheduleToken.ResourceObj</Value>
+          </Property>
+          <Property Name="NewValue">Resources.ResourceName</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="31" />
+      </Step>
+      <Step Type="Search" Name="WorkInProcess" ID="34">
+        <Properties>
+          <Property Name="CollectionType">TableRows</Property>
+          <Property Name="TableName">WorkInProcess</Property>
+          <Property Name="SearchType">MinimizeExpression</Property>
+          <Property Name="MatchCondition">WorkInProcess.CurrentResource == FreezeScheduleToken.ResourceObj</Property>
+          <Property Name="SearchExpression"></Property>
+          <Property Name="Limit">Infinity</Property>
+          <Property Name="SaveNumberFound">
+            <Value>FreezeScheduleToken.NumberFound</Value>
+          </Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="37" />
+        <Exit Name="Found" Type="Alternate" NextID="35" />
+      </Step>
+      <Step Type="Assign" Name="CandidateEntityName" ID="35">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeScheduleToken.CandidateEntityName</Value>
+          </Property>
+          <Property Name="NewValue">WorkInProcess.OrderId</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="19" />
+      </Step>
+      <Step Type="Decide" Name="LastFrozenEntity != MyToken1.CandidateEntity" ID="36">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">String.Length(LastFrozenEntityName) &gt; 0</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="24" />
+      </Step>
+      <Step Type="Decide" Name="FreezeSchedule" ID="37">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">Resources.FreezeSchedule</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="2" />
+        <Exit Name="False" Type="Alternate" NextID="36" />
+      </Step>
+      <Step Type="Search" Name="Routings" ID="38">
+        <Properties>
+          <Property Name="CollectionType">TableRows</Property>
+          <Property Name="TableName">Routings</Property>
+          <Property Name="SearchType">MinimizeExpression</Property>
+          <Property Name="MatchCondition">Routings.RoutingKey == FreezeScheduleToken.RouteKey</Property>
+          <Property Name="SearchExpression">String.ToReal(  Routings.RoutingNumber )</Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="6" />
+      </Step>
+      <Step Type="Assign" Name="RouteKey" ID="39">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>FreezeScheduleToken.RouteKey</Value>
+          </Property>
+          <Property Name="NewValue">PublishedSchedule.RoutingKey</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="38" />
+      </Step>
+      <Step Type="Search" Name="FreezeListRequirements" ID="40">
+        <Properties>
+          <Property Name="CollectionType">TableRows</Property>
+          <Property Name="TableName">FreezeListRequirements</Property>
+          <Property Name="Limit">Infinity</Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="42" />
+        <Exit Name="Found" Type="Alternate" NextID="41" />
+      </Step>
+      <Step Type="Stipulate" Name="NodeListReq" ID="41">
+        <Properties>
+          <Property Name="StipulationType">NodeListRequirement</Property>
+          <Property Name="Entity">FreezeListRequirements.CandidateEntityName</Property>
+          <Property Name="NodeList">FreezeListRequirements.NodeList</Property>
+          <Property Name="RequiredNode">FreezeListRequirements.RequiredNode</Property>
+        </Properties>
+      </Step>
+      <Step Type="Search" Name="FreezeRoutingDependencies" ID="42">
+        <Properties>
+          <Property Name="CollectionType">TableRows</Property>
+          <Property Name="TableName">FreezeRoutingDependencies</Property>
+          <Property Name="Limit">Infinity</Property>
+        </Properties>
+        <Exit Name="Found" Type="Alternate" NextID="43" />
+      </Step>
+      <Step Type="Stipulate" Name="NodeListRoutingDependency" ID="43">
+        <Properties>
+          <Property Name="Entity">FreezeRoutingDependencies.CandidateEntityName</Property>
+          <Property Name="NodeList">FreezeRoutingDependencies.NodeList</Property>
+          <Property Name="EntityToFollow">FreezeRoutingDependencies.FollowsEntityName</Property>
+          <Property Name="PriorUsageCount">FreezeRoutingDependencies.PriorUsageCount</Property>
+        </Properties>
+      </Step>
+    </Steps>
+  </Process>
+  <Process Name="Mixing_AfterProcessing" BeginStepID="2" Category="Mixing">
+    <Properties />
+    <Steps>
+      <Step Type="SetRow" Name="Routings..Dispose" ID="2">
+        <Properties>
+          <Property Name="TableName">Routings</Property>
+          <Property Name="RowNumber">3</Property>
+        </Properties>
+      </Step>
+    </Steps>
+  </Process>
+  <Process Name="WaitForTankFill" BeginStepID="5" Category="Mixing">
+    <Properties>
+      <Property Name="TokenClassName">WaitToken</Property>
+    </Properties>
+    <Steps>
+      <Step Type="Create" Name="ManufacturingOrderEntity" ID="2">
+        <Properties>
+          <Property Name="CreateType">CopyAssociatedObject</Property>
+          <Property Name="EntityType">ManufacturingOrderEntity</Property>
+          <Property Name="SourceEntityObject">
+            <Value>ModelEntity</Value>
+          </Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="3" />
+        <Exit Name="Created" Type="Alternate" NextID="4" />
+      </Step>
+      <Step Type="Wait" Name="ReleaseMixing" ID="3">
+        <Properties>
+          <Property Name="EventName">ReleaseMixing</Property>
+          <Property Name="EventCondition">ManufacturingOrders.OrderId == MixingOrderId</Property>
+        </Properties>
+      </Step>
+      <Step Type="SetRow" Name="Routings" ID="4">
+        <Properties>
+          <Property Name="TableName">Routings</Property>
+          <Property Name="RowNumber">1</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="6" />
+      </Step>
+      <Step Type="Assign" Name="Server" ID="5">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>WaitToken.Server</Value>
+          </Property>
+          <Property Name="NewValue">Server</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="2" />
+      </Step>
+      <Step Type="Transfer" Name="Output" ID="6">
+        <Properties>
+          <Property Name="NodeName">WaitToken.Server.Server.Output</Property>
+        </Properties>
+      </Step>
+    </Steps>
+  </Process>
+  <Process Name="OnDestinationNodeAssigned" BeginStepID="13" Category="RoutingGroups">
+    <Properties>
+      <Property Name="TokenClassName">CheckToken</Property>
+    </Properties>
+    <Steps>
+      <Step Type="Search" Name="ResourceReservations" ID="2">
+        <Properties>
+          <Property Name="CollectionType">TableRows</Property>
+          <Property Name="EntityType">WIPEntity</Property>
+          <Property Name="QueueStateName">
+            <Value>ResourceReservationsStorage.Queue</Value>
+          </Property>
+          <Property Name="TableName">ResourceReservations</Property>
+          <Property Name="MatchCondition">ResourceReservations.OrderId == CheckToken.OrderId &amp;&amp; ResourceReservations.RoutingKey == CheckToken.RoutingKey &amp;&amp; ResourceReservations.IsPrimary == False</Property>
+          <Property Name="Limit">Infinity</Property>
+        </Properties>
+        <Exit Name="Found" Type="Alternate" NextID="5" />
+      </Step>
+      <Step Type="Assign" Name="OrderId" ID="3">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.OrderId</Value>
+          </Property>
+          <Property Name="NewValue">ManufacturingOrders.OrderId</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="4" />
+      </Step>
+      <Step Type="Assign" Name="RoutingKey" ID="4">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.RoutingKey</Value>
+          </Property>
+          <Property Name="NewValue">Routings.RoutingKey</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="2" />
+      </Step>
+      <Step Type="Assign" Name="ReservationSecondaryResource" ID="5">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentEntity.ModelEntity.ReservationSecondaryResource</Value>
+          </Property>
+          <Property Name="NewValue">ResourceReservations.Resource</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="6" />
+      </Step>
+      <Step Type="Reserve" Name="ReservationSecondaryResource" ID="6">
+        <Properties>
+          <Property Name="OwnerType">SpecificObject</Property>
+          <Property Name="OwnerObject">
+            <Value>CheckToken.CurrentEntity.ModelEntity</Value>
+          </Property>
+          <Property Name="ResourceName">CheckToken.CurrentEntity.ModelEntity.ReservationSecondaryResource</Property>
+        </Properties>
+      </Step>
+      <Step Type="Assign" Name="Resource" ID="7">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.Resource</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.ContextObject.Node.AssociatedObject</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="3" />
+      </Step>
+      <Step Type="Decide" Name="NONE Lookaheads" ID="8">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">LookAheads == List.LookAheadType.None</Property>
+        </Properties>
+        <Exit Name="False" Type="Alternate" NextID="9" />
+      </Step>
+      <Step Type="Decide" Name="Simple Lookaheads" ID="9">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">LookAheads == List.LookAheadType.Simple</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="10" />
+        <Exit Name="False" Type="Alternate" NextID="12" />
+      </Step>
+      <Step Type="Search" Name="Workers" ID="10">
+        <Properties>
+          <Property Name="EntityType">RoutingsSecondaryResources[1].Resource</Property>
+          <Property Name="ObjectListName">RoutingsSecondaryResources.Resource</Property>
+          <Property Name="SearchType">MinimizeExpression</Property>
+          <Property Name="MatchCondition">Candidate.Worker.Capacity.ReservedTo( ModelEntity )</Property>
+          <Property Name="SearchExpression">Candidate.Worker.ID</Property>
+        </Properties>
+        <Exit Name="Found" Type="Alternate" NextID="11" />
+      </Step>
+      <Step Type="Assign" Name="ReservationSecondaryResource" ID="11">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentEntity.ModelEntity.ReservationSecondaryResource</Value>
+          </Property>
+          <Property Name="NewValue">Worker</Property>
+        </Properties>
+      </Step>
+      <Step Type="Decide" Name="Complex Lookaheads" ID="12">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">LookAheads == List.LookAheadType.Complex</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="7" />
+      </Step>
+      <Step Type="Assign" Name="CurrentEntity" ID="13">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentEntity</Value>
+          </Property>
+          <Property Name="NewValue">ModelEntity</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="8" />
+      </Step>
+    </Steps>
+  </Process>
+  <Process Name="OnEvaluatingRouteRequest" BeginStepID="55" Category="RoutingGroups">
+    <Properties>
+      <Property Name="TokenClassName">CheckToken</Property>
+    </Properties>
+    <Steps>
+      <Step Type="Execute" Name="CheckSecondaryResources" Color="c0ffc0" ID="2">
+        <Properties>
+          <Property Name="ProcessName">
+            <Value>CheckSecondaryResources</Value>
+            <InputParameters>
+              <Properties>
+                <Property Name="ReserveStartTime">CheckToken.ReserveStartTime</Property>
+                <Property Name="ReserveEndTime">CheckToken.ReserveEndTime</Property>
+                <Property Name="ReasonCode">1</Property>
+              </Properties>
+            </InputParameters>
+            <ReturnedValues>
+              <Properties>
+                <Property Name="ReturnValue">
+                  <Value>CheckToken.ReturnValue</Value>
+                </Property>
+                <Property Name="EventDelayTime">
+                  <Value>CheckToken.EventDelayTime</Value>
+                </Property>
+                <Property Name="ReasonCode">
+                  <Value>CheckToken.ReasonCode</Value>
+                </Property>
+                <Property Name="IsPrimary">
+                  <Value>CheckToken.IsPrimary</Value>
+                </Property>
+                <Property Name="EventDelayResource">
+                  <Value>CheckToken.EventDelayResource</Value>
+                </Property>
+              </Properties>
+            </ReturnedValues>
+          </Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="30" />
+      </Step>
+      <Step Type="Execute" Name="AddResourceReservation" Color="ff8000" ID="3">
+        <Properties>
+          <Property Name="ProcessName">
+            <Value>AddResourceReservation</Value>
+            <InputParameters>
+              <Properties>
+                <Property Name="IsPrimary">True</Property>
+              </Properties>
+            </InputParameters>
+          </Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="7" />
+      </Step>
+      <Step Type="Assign" Name="ReserveStartTime" ID="4">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.ReserveStartTime</Value>
+          </Property>
+          <Property Name="NewValue">TimeNow</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="5" />
+      </Step>
+      <Step Type="Assign" Name="ReserveEndTime" ID="5">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.ReserveEndTime</Value>
+          </Property>
+          <Property Name="NewValue">TimeNow + CheckToken.CurrentSequenceProcessingTime</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="41" />
+      </Step>
+      <Step Type="Assign" Name="CurrentSequenceProcessingTime" ID="6">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentSequenceProcessingTime</Value>
+          </Property>
+          <Property Name="NewValue">ManufacturingOrders.Quantity * Routings.ProcessTime</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="4" />
+      </Step>
+      <Step Type="Decide" Name="SuccessorRoutingNumber == 0" ID="7">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">String.ToReal(  Routings.SuccessorRoutingNumber ) == 0</Property>
+        </Properties>
+        <Exit Name="False" Type="Alternate" NextID="13" />
+      </Step>
+      <Step Type="Assign" Name="MaterialName" ID="8">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.MaterialName</Value>
+          </Property>
+          <Property Name="NewValue">Routings.MaterialName</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="27" />
+      </Step>
+      <Step Type="Assign" Name="RoutingKey" ID="9">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.RoutingKey</Value>
+          </Property>
+          <Property Name="NewValue">Routings.RoutingKey</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="10" />
+      </Step>
+      <Step Type="Assign" Name="RoutingNumber" ID="10">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.RoutingNumber</Value>
+          </Property>
+          <Property Name="NewValue">Routings.RoutingNumber</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="28" />
+      </Step>
+      <Step Type="Assign" Name="SuccessorRoutingNumber" ID="11">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.SuccessorRoutingNumber</Value>
+          </Property>
+          <Property Name="NewValue">Routings.SuccessorRoutingNumber</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="6" />
+      </Step>
+      <Step Type="Assign" Name="TransferNode" ID="12">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.TransferNode</Value>
+          </Property>
+          <Property Name="NewValue">Routings.Sequence</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="9" />
+      </Step>
+      <Step Type="Execute" Name="CheckDownsteamResourceAvailablity" Color="00ff00" ID="13">
+        <Properties>
+          <Property Name="ProcessName">
+            <Value>CheckDownsteamResourceAvailablity</Value>
+            <ReturnedValues>
+              <Properties>
+                <Property Name="IsAvailable">
+                  <Value>CheckToken.ReturnValue</Value>
+                </Property>
+              </Properties>
+            </ReturnedValues>
+          </Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="32" />
+      </Step>
+      <Step Type="Search" Name="ResourceReservations" ID="14">
+        <Properties>
+          <Property Name="CollectionType">TableRows</Property>
+          <Property Name="EntityType">WIPEntity</Property>
+          <Property Name="QueueStateName">
+            <Value>ResourceReservationStorage.Queue</Value>
+          </Property>
+          <Property Name="TableName">ResourceReservations</Property>
+          <Property Name="MatchCondition">ResourceReservations.OrderId == CheckToken.OrderId &amp;&amp; ResourceReservations.RoutingKey == CheckToken.RoutingKey &amp;&amp; ResourceReservations.IsPrimary == True</Property>
+          <Property Name="SaveNumberFound">
+            <Value>CheckToken.NumberOfRows</Value>
+          </Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="15" />
+      </Step>
+      <Step Type="Decide" Name="I have no primary res for key" ID="15">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.NumberOfRows == 0</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="2" />
+        <Exit Name="False" Type="Alternate" NextID="16" />
+      </Step>
+      <Step Type="Search" Name="ResourceReservations" ID="16">
+        <Properties>
+          <Property Name="CollectionType">TableRows</Property>
+          <Property Name="EntityType">WIPEntity</Property>
+          <Property Name="QueueStateName">
+            <Value>ResourceReservationStorage.Queue</Value>
+          </Property>
+          <Property Name="TableName">ResourceReservations</Property>
+          <Property Name="SearchType">MinimizeExpression</Property>
+          <Property Name="MatchCondition">ResourceReservations.OrderId == CheckToken.OrderId &amp;&amp; ResourceReservations.RoutingKey == CheckToken.RoutingKey &amp;&amp; ResourceReservations.Resource == CheckToken.Resource </Property>
+          <Property Name="SearchExpression">ResourceReservations.ReserveStartTime</Property>
+          <Property Name="SaveNumberFound">
+            <Value>CheckToken.NumberOfRows</Value>
+          </Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="17" />
+        <Exit Name="Found" Type="Alternate" NextID="22" />
+      </Step>
+      <Step Type="Decide" Name="I have res for resoruce" ID="17">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.NumberOfRows &gt; 0</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="18" />
+        <Exit Name="False" Type="Alternate" NextID="21" />
+      </Step>
+      <Step Type="Decide" Name="Start Now" ID="18">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">TimeNow &gt;= CheckToken.ReturnValue</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="19" />
+        <Exit Name="False" Type="Alternate" NextID="20" />
+      </Step>
+      <Step Type="Assign" Name="T ReturnValue" ID="19">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.ReturnValue</Value>
+          </Property>
+          <Property Name="NewValue">True</Property>
+        </Properties>
+      </Step>
+      <Step Type="Assign" Name="F ReturnValue" ID="20">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.ReturnValue</Value>
+          </Property>
+          <Property Name="NewValue">False</Property>
+        </Properties>
+      </Step>
+      <Step Type="Assign" Name="F ReturnValue" ID="21">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.ReturnValue</Value>
+          </Property>
+          <Property Name="NewValue">False</Property>
+        </Properties>
+      </Step>
+      <Step Type="Decide" Name="Start Now" ID="22">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">TimeNow &gt;= ResourceReservations.ReserveStartTime</Property>
+        </Properties>
+        <Exit Name="False" Type="Alternate" NextID="23" />
+      </Step>
+      <Step Type="Assign" Name="EventDelayResource" ID="23">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.EventDelayResource</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.Resource</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="24" />
+      </Step>
+      <Step Type="Assign" Name="EventDelayTime" ID="24">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.EventDelayTime</Value>
+          </Property>
+          <Property Name="NewValue">ResourceReservations.ReserveStartTime - TimeNow</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="25" />
+      </Step>
+      <Step Type="Execute" Name="ScheduleFutureTriggerRoutingGroupTrigger" Color="ff00ff" ID="25">
+        <Properties>
+          <Property Name="ProcessName">
+            <Value>ScheduleFutureTriggerRoutingGroupTrigger</Value>
+            <InputParameters>
+              <Properties>
+                <Property Name="IsPrimary">True</Property>
+              </Properties>
+            </InputParameters>
+          </Property>
+          <Property Name="TokenWaitAction">None (Continue)</Property>
+        </Properties>
+      </Step>
+      <Step Type="Assign" Name="UpstreamProcessingTime" ID="26">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.UpstreamProcessingTime</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.UpstreamProcessingTime + Routings.StartOffset</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="39" />
+      </Step>
+      <Step Type="Assign" Name="OrderId" ID="27">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.OrderId</Value>
+          </Property>
+          <Property Name="NewValue">ManufacturingOrders.OrderId</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="12" />
+      </Step>
+      <Step Type="Assign" Name="StartingTransferNode" ID="28">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.StartingTransferNode</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.TransferNode</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="29" />
+      </Step>
+      <Step Type="Assign" Name="StartingRoutingKey" ID="29">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.StartingRoutingKey</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.RoutingKey</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="11" />
+      </Step>
+      <Step Type="Decide" Name="T ReturnValue" ID="30">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.ReturnValue == True</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="3" />
+        <Exit Name="False" Type="Alternate" NextID="31" />
+      </Step>
+      <Step Type="Execute" Name="ScheduleFutureTriggerRoutingGroupTrigger" Color="ff00ff" ID="31">
+        <Properties>
+          <Property Name="ProcessName">
+            <Value>ScheduleFutureTriggerRoutingGroupTrigger</Value>
+            <InputParameters>
+              <Properties>
+                <Property Name="IsPrimary">True</Property>
+              </Properties>
+            </InputParameters>
+          </Property>
+          <Property Name="TokenWaitAction">None (Continue)</Property>
+        </Properties>
+      </Step>
+      <Step Type="Decide" Name="T ReturnValue" ID="32">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.ReturnValue == True</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="36" />
+        <Exit Name="False" Type="Alternate" NextID="33" />
+      </Step>
+      <Step Type="Search" Name="ResourceReservations" ID="33">
+        <Properties>
+          <Property Name="CollectionType">TableRows</Property>
+          <Property Name="EntityType">WIPEntity</Property>
+          <Property Name="QueueStateName">
+            <Value>ResourceReservationsStorage.Queue</Value>
+          </Property>
+          <Property Name="TableName">ResourceReservations</Property>
+          <Property Name="SearchType">Backward</Property>
+          <Property Name="MatchCondition">ResourceReservations.OrderId == CheckToken.OrderId &amp;&amp; ResourceReservations.StartingRoutingKey == CheckToken.RoutingKey &amp;&amp; ResourceReservations.TimeNow == TimeNow </Property>
+          <Property Name="Limit">Infinity</Property>
+        </Properties>
+        <Exit Name="Found" Type="Alternate" NextID="34" />
+      </Step>
+      <Step Type="RemoveRows" Name="ResourceReservations" ID="34">
+        <Properties>
+          <Property Name="TableName">ResourceReservations</Property>
+          <Property Name="RemovalType">RemoveActiveRow</Property>
+          <Property Name="ObjectType">Token</Property>
+        </Properties>
+      </Step>
+      <Step Type="Assign" Name="Resource" ID="35">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.Resource</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.ContextObject.Node.AssociatedObject</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="8" />
+      </Step>
+      <Step Type="Assign" Name="F ReturnValue" ID="36">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.ReturnValue</Value>
+          </Property>
+          <Property Name="NewValue">False</Property>
+        </Properties>
+      </Step>
+      <Step Type="Assign" Name="F ReturnValue" ID="37">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.ReturnValue</Value>
+          </Property>
+          <Property Name="NewValue">False</Property>
+        </Properties>
+      </Step>
+      <Step Type="Search" Name="ResourceReservations" ID="38">
+        <Properties>
+          <Property Name="CollectionType">TableRows</Property>
+          <Property Name="EntityType">WIPEntity</Property>
+          <Property Name="QueueStateName">
+            <Value>ResourceReservationsStorage.Queue</Value>
+          </Property>
+          <Property Name="TableName">ResourceReservations</Property>
+          <Property Name="SearchType">MaximizeExpression</Property>
+          <Property Name="MatchCondition">( ResourceReservations.OrderId != CheckToken.OrderId ||  ResourceReservations.RoutingKey != CheckToken.RoutingKey) &amp;&amp; ResourceReservations.Resource == CheckToken.Resource &amp;&amp; ((CheckToken.ReserveStartTime &lt;= ResourceReservations.ReserveStartTime &amp;&amp; CheckToken.ReserveEndTime &gt;= ResourceReservations.ReserveEndTime) || (CheckToken.ReserveStartTime &gt;= ResourceReservations.ReserveStartTime &amp;&amp; CheckToken.ReserveStartTime &lt; ResourceReservations.ReserveEndTime) || (CheckToken.ReserveEndTime &gt; ResourceReservations.ReserveStartTime &amp;&amp; CheckToken.ReserveEndTime &lt;= ResourceReservations.ReserveEndTime))</Property>
+          <Property Name="SearchExpression">ResourceReservations.ReserveEndTime</Property>
+          <Property Name="SaveNumberFound">
+            <Value>CheckToken.NumberOfRows</Value>
+          </Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="40" />
+      </Step>
+      <Step Type="Decide" Name="Capacity.Initial &gt; 0" ID="39">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.Resource.Server.Capacity.Initial &gt; 0</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="38" />
+        <Exit Name="False" Type="Alternate" NextID="14" />
+      </Step>
+      <Step Type="Decide" Name="Others have no res" ID="40">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.NumberOfRows &lt; CheckToken.Resource.Server.CurrentCapacity</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="14" />
+        <Exit Name="False" Type="Alternate" NextID="37" />
+      </Step>
+      <Step Type="Decide" Name="StartOffset &gt; 0" ID="41">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">Routings.StartOffset &gt; 0</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="26" />
+        <Exit Name="False" Type="Alternate" NextID="42" />
+      </Step>
+      <Step Type="Assign" Name="UpstreamProcessingTime" ID="42">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.UpstreamProcessingTime</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.UpstreamProcessingTime + CheckToken.CurrentSequenceProcessingTime</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="39" />
+      </Step>
+      <Step Type="Decide" Name="NONE Lookaheads" ID="43">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">LookAheads == List.LookAheadType.None</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="52" />
+        <Exit Name="False" Type="Alternate" NextID="51" />
+      </Step>
+      <Step Type="Search" Name="Workers" ID="44">
+        <Properties>
+          <Property Name="EntityType">RoutingsSecondaryResources[1].Resource</Property>
+          <Property Name="ObjectListName">RoutingsSecondaryResources.Resource</Property>
+          <Property Name="SearchType">MinimizeExpression</Property>
+          <Property Name="MatchCondition">Candidate.Worker.Capacity.ReservedTo( ModelEntity )</Property>
+          <Property Name="SearchExpression">Candidate.Worker.ID</Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="45" />
+      </Step>
+      <Step Type="Decide" Name="ReturnValue == 0" ID="45">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.ReturnValue == 0</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="46" />
+        <Exit Name="False" Type="Alternate" NextID="50" />
+      </Step>
+      <Step Type="Search" Name="Workers" ID="46">
+        <Properties>
+          <Property Name="EntityType">RoutingsSecondaryResources[1].Resource</Property>
+          <Property Name="ObjectListName">RoutingsSecondaryResources.Resource</Property>
+          <Property Name="SearchType">MinimizeExpression</Property>
+          <Property Name="MatchCondition">Candidate.Worker.Capacity.Remaining &gt; 0 &amp;&amp; Candidate.Worker.Capacity.Remaining  &gt; Candidate.Worker.Capacity.Reserved</Property>
+          <Property Name="SearchExpression">Candidate.Worker.ID</Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="48" />
+        <Exit Name="Found" Type="Alternate" NextID="47" />
+      </Step>
+      <Step Type="Reserve" Name="Worker" ID="47">
+        <Properties>
+          <Property Name="OwnerType">SpecificObject</Property>
+          <Property Name="OwnerObject">
+            <Value>ModelEntity</Value>
+          </Property>
+          <Property Name="ResourceName">Worker</Property>
+        </Properties>
+      </Step>
+      <Step Type="Decide" Name="ReturnValue &gt; 0" ID="48">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.ReturnValue &gt; 0</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="50" />
+        <Exit Name="False" Type="Alternate" NextID="49" />
+      </Step>
+      <Step Type="Assign" Name="F ReturnValue" ID="49">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.ReturnValue</Value>
+          </Property>
+          <Property Name="NewValue">False</Property>
+        </Properties>
+      </Step>
+      <Step Type="Assign" Name="T ReturnValue" ID="50">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.ReturnValue</Value>
+          </Property>
+          <Property Name="NewValue">True</Property>
+        </Properties>
+      </Step>
+      <Step Type="Decide" Name="Simple Lookaheads" ID="51">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">LookAheads == List.LookAheadType.Simple</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="44" />
+        <Exit Name="False" Type="Alternate" NextID="53" />
+      </Step>
+      <Step Type="Assign" Name="T ReturnValue" ID="52">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.ReturnValue</Value>
+          </Property>
+          <Property Name="NewValue">True</Property>
+        </Properties>
+      </Step>
+      <Step Type="Decide" Name="Complex Lookaheads" ID="53">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">LookAheads == List.LookAheadType.Complex</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="35" />
+        <Exit Name="False" Type="Alternate" NextID="54" />
+      </Step>
+      <Step Type="Notify" Name="Bad Look Ahead Value" ID="54">
+        <Properties>
+          <Property Name="NotificationType">Error</Property>
+          <Property Name="MessageHeading">"Bad Look Ahead Value"</Property>
+          <Property Name="MessageContent">"Bad Look Ahead Value...Make sure value is either None, Simple or Complex"</Property>
+        </Properties>
+      </Step>
+      <Step Type="Assign" Name="CurrentEntity" ID="55">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentEntity</Value>
+          </Property>
+          <Property Name="NewValue">ModelEntity</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="43" />
+      </Step>
+    </Steps>
+  </Process>
+  <Process Name="CheckSecondaryResources" BeginStepID="2" Category="SecondaryResources">
+    <Properties>
+      <Property Name="ReportStatistics">False</Property>
+      <Property Name="TokenClassName">CheckToken</Property>
+      <Property Name="InputArguments">
+        <Rows>
+          <Properties>
+            <Property Name="InputArgumentName">ReserveStartTime</Property>
+            <Property Name="InputArgumentStateVariableName">
+              <Value>CheckToken.ReserveStartTime</Value>
+            </Property>
+          </Properties>
+          <Properties>
+            <Property Name="InputArgumentName">ReserveEndTime</Property>
+            <Property Name="InputArgumentStateVariableName">
+              <Value>CheckToken.ReserveEndTime</Value>
+            </Property>
+          </Properties>
+          <Properties>
+            <Property Name="InputArgumentName">ReasonCode</Property>
+            <Property Name="InputArgumentStateVariableName">
+              <Value>CheckToken.ReasonCode</Value>
+            </Property>
+          </Properties>
+        </Rows>
+      </Property>
+      <Property Name="ReturnValues">
+        <Rows>
+          <Properties>
+            <Property Name="ReturnValueName">ReturnValue</Property>
+            <Property Name="ReturnValueExpression">CheckToken.ReturnValue</Property>
+          </Properties>
+          <Properties>
+            <Property Name="ReturnValueName">EventDelayTime</Property>
+            <Property Name="ReturnValueExpression">CheckToken.EventDelayTime</Property>
+          </Properties>
+          <Properties>
+            <Property Name="ReturnValueName">ReasonCode</Property>
+            <Property Name="ReturnValueExpression">CheckToken.ReasonCode</Property>
+          </Properties>
+          <Properties>
+            <Property Name="ReturnValueName">IsPrimary</Property>
+            <Property Name="ReturnValueExpression">CheckToken.IsPrimary</Property>
+          </Properties>
+          <Properties>
+            <Property Name="ReturnValueName">EventDelayResource</Property>
+            <Property Name="ReturnValueExpression">CheckToken.EventDelayResource</Property>
+          </Properties>
+        </Rows>
+      </Property>
+    </Properties>
+    <Steps>
+      <Step Type="Assign" Name="F SecondariesAvailable" ID="2">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>ModelEntity.SecondariesAvailable</Value>
+          </Property>
+          <Property Name="NewValue">False</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="27" />
+      </Step>
+      <Step Type="Search" Name="RoutingsSecondaryResources" ID="3">
+        <Properties>
+          <Property Name="EntityType">RoutingsSecondaryResources[1].Resource</Property>
+          <Property Name="ObjectListName">CheckToken.SecondaryCheckOpList</Property>
+          <Property Name="TableName">RoutingsSecondaryResources</Property>
+          <Property Name="Limit">Infinity</Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="6" />
+        <Exit Name="Found" Type="Alternate" NextID="28" />
+      </Step>
+      <Step Type="Decide" Name="AverageAvailability &gt;= 1" ID="4">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.AverageAvailability &gt;= 1</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="5" />
+      </Step>
+      <Step Type="Assign" Name="T SecondariesAvailable" ID="5">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentEntity.ModelEntity.SecondariesAvailable</Value>
+          </Property>
+          <Property Name="NewValue">True</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="25" />
+      </Step>
+      <Step Type="Decide" Name="SecondariesAvailable == True" ID="6">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.CurrentEntity.ModelEntity.SecondariesAvailable == True</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="9" />
+        <Exit Name="False" Type="Alternate" NextID="12" />
+      </Step>
+      <Step Type="Assign" Name="EventDelayTime" ID="7">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.EventDelayTime</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.CurrentEntity.ModelEntity.EventDelayTime</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="33" />
+      </Step>
+      <Step Type="Assign" Name="Resource" ID="8">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.Resource</Value>
+          </Property>
+          <Property Name="NewValue">Worker</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="35" />
+      </Step>
+      <Step Type="Decide" Name="T ResourceFound" ID="9">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.CurrentEntity.ModelEntity.ResourceFound == True</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="34" />
+        <Exit Name="False" Type="Alternate" NextID="31" />
+      </Step>
+      <Step Type="Search" Name="RoutingsSecondaryResources" ID="10">
+        <Properties>
+          <Property Name="EntityType">RoutingsSecondaryResources[1].Resource</Property>
+          <Property Name="ObjectListName">CheckToken.SecondaryCheckOpList</Property>
+          <Property Name="TableName">RoutingsSecondaryResources</Property>
+          <Property Name="Limit">Infinity</Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="7" />
+        <Exit Name="Found" Type="Alternate" NextID="11" />
+      </Step>
+      <Step Type="Assign" Name="Resource" ID="11">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.Resource</Value>
+          </Property>
+          <Property Name="NewValue">Worker</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="36" />
+      </Step>
+      <Step Type="Assign" Name="EventDelayTime" ID="12">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentEntity.ModelEntity.EventDelayTime</Value>
+          </Property>
+          <Property Name="NewValue">Run.EndingTime - TimeNow</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="10" />
+      </Step>
+      <Step Type="Decide" Name="EventDelayTime &lt; CheckToken.CurrentEntity.ModelEntity.EventDelayTime" Color="00c0c0" ID="13">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.EventDelayTime &lt; CheckToken.CurrentEntity.ModelEntity.EventDelayTime</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="14" />
+      </Step>
+      <Step Type="Assign" Name="EventDelayTime" ID="14">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentEntity.ModelEntity.EventDelayTime</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.EventDelayTime</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="15" />
+      </Step>
+      <Step Type="Assign" Name="EventDelayResource" ID="15">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentEntity.ModelEntity.EventDelayResource</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.Resource</Property>
+        </Properties>
+      </Step>
+      <Step Type="Search" Name="ResourceReservations" ID="16">
+        <Properties>
+          <Property Name="CollectionType">TableRows</Property>
+          <Property Name="EntityType">WIPEntity</Property>
+          <Property Name="QueueStateName">
+            <Value>ResourceReservationsStorage.Queue</Value>
+          </Property>
+          <Property Name="TableName">ResourceReservations</Property>
+          <Property Name="SearchType">MaximizeExpression</Property>
+          <Property Name="MatchCondition">ResourceReservations.Resource == CheckToken.Resource &amp;&amp; ((CheckToken.ReserveStartTime &lt;= ResourceReservations.ReserveStartTime &amp;&amp; CheckToken.ReserveEndTime &gt;= ResourceReservations.ReserveEndTime) || (CheckToken.ReserveStartTime &gt;= ResourceReservations.ReserveStartTime &amp;&amp; CheckToken.ReserveStartTime &lt; ResourceReservations.ReserveEndTime) || (CheckToken.ReserveEndTime &gt; ResourceReservations.ReserveStartTime &amp;&amp; CheckToken.ReserveEndTime &lt;= ResourceReservations.ReserveEndTime))</Property>
+          <Property Name="SearchExpression">ResourceReservations.ReserveEndTime</Property>
+          <Property Name="SaveNumberFound">
+            <Value>CheckToken.NumberOfRows</Value>
+          </Property>
+        </Properties>
+        <Exit Name="Original" Type="Primary" NextID="18" />
+      </Step>
+      <Step Type="Assign" Name="EventDelayTime" Description="EventDelayTime" ID="17">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.EventDelayTime</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.ReturnValue -TimeNow</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="19" />
+      </Step>
+      <Step Type="Decide" Name="Others have res" Description="No Reservation Found For Cohort" ID="18">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.NumberOfRows &gt; 0 </Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="17" />
+        <Exit Name="False" Type="Alternate" NextID="20" />
+      </Step>
+      <Step Type="Decide" Name="EventDelayTime &gt; 0" ID="19">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.EventDelayTime &gt; 0</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="22" />
+        <Exit Name="False" Type="Alternate" NextID="20" />
+      </Step>
+      <Step Type="Execute" Name="AddResourceReservation" Color="ff8000" ID="20">
+        <Properties>
+          <Property Name="ProcessName">
+            <Value>AddResourceReservation</Value>
+            <InputParameters>
+              <Properties>
+                <Property Name="IsPrimary">False</Property>
+              </Properties>
+            </InputParameters>
+          </Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="21" />
+      </Step>
+      <Step Type="Assign" Name="T ResourceFound" ID="21">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentEntity.ModelEntity.ResourceFound</Value>
+          </Property>
+          <Property Name="NewValue">True</Property>
+        </Properties>
+      </Step>
+      <Step Type="Decide" Name="EventDelayTime &lt; CheckToken.CurrentEntity.ModelEntity.EventDelayTime" ID="22">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.EventDelayTime &lt; CheckToken.CurrentEntity.ModelEntity.EventDelayTime</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="23" />
+      </Step>
+      <Step Type="Assign" Name="EventDelayTime" ID="23">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentEntity.ModelEntity.EventDelayTime</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.EventDelayTime</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="24" />
+      </Step>
+      <Step Type="Assign" Name="EventDelayResource" ID="24">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentEntity.ModelEntity.EventDelayResource</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.Resource</Property>
+        </Properties>
+      </Step>
+      <Step Type="Decide" Name="F ResourceFound" ID="25">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.CurrentEntity.ModelEntity.ResourceFound == False</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="16" />
+      </Step>
+      <Step Type="Assign" Name="EventDelayTime" ID="26">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentEntity.ModelEntity.EventDelayTime</Value>
+          </Property>
+          <Property Name="NewValue">Run.EndingTime - TimeNow</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="29" />
+      </Step>
+      <Step Type="Assign" Name="F ResourceFound" ID="27">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentEntity.ModelEntity.ResourceFound</Value>
+          </Property>
+          <Property Name="NewValue">False</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="26" />
+      </Step>
+      <Step Type="Decide" Name="F ResourceFound" ID="28">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.CurrentEntity.ModelEntity.ResourceFound == False</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="8" />
+      </Step>
+      <Step Type="Assign" Name="EventDelayResource" ID="29">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.CurrentEntity.ModelEntity.EventDelayResource</Value>
+          </Property>
+          <Property Name="NewValue">Nothing</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="3" />
+      </Step>
+      <Step Type="Assign" Name="F ReturnValue" ID="30">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.ReturnValue</Value>
+          </Property>
+          <Property Name="NewValue">False</Property>
+        </Properties>
+      </Step>
+      <Step Type="Assign" Name="EventDelayTime" ID="31">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.EventDelayTime</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.CurrentEntity.ModelEntity.EventDelayTime</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="32" />
+      </Step>
+      <Step Type="Assign" Name="++ ReasonCode" ID="32">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.ReasonCode</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.ReasonCode + 1</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="33" />
+      </Step>
+      <Step Type="Assign" Name="EventDelayResource" ID="33">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.EventDelayResource</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.CurrentEntity.ModelEntity.EventDelayResource</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="30" />
+      </Step>
+      <Step Type="Assign" Name="T ReturnValue" ID="34">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.ReturnValue</Value>
+          </Property>
+          <Property Name="NewValue">True</Property>
+        </Properties>
+      </Step>
+      <Step Type="Assign" Name="AverageAvailability" Description="zWorker.WorkSchedule.Schedule.AverageValue( CheckToken.ReserveStartTime, CheckToken.ReserveEndTime )" ID="35">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.AverageAvailability</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.Resource.Worker.CurrentWorkSchedule.AverageValue( CheckToken.ReserveStartTime, CheckToken.ReserveEndTime )</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="4" />
+      </Step>
+      <Step Type="Assign" Name="TimeOfNextValue" ID="36">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.TimeOfNextValue</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.Resource.Worker.CurrentWorkSchedule.TimeOfNextValue( CheckToken.ReserveStartTime ) </Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="37" />
+      </Step>
+      <Step Type="Assign" Name="NextValue" ID="37">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.NextValue</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.Resource.Worker.WorkSchedule.Schedule.NextValue( CheckToken.ReserveStartTime ) </Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="38" />
+      </Step>
+      <Step Type="Decide" Name="NextValue &gt; 0" ID="38">
+        <Properties>
+          <Property Name="DecideType">ConditionBased</Property>
+          <Property Name="ConditionOrProbability">CheckToken.NextValue &gt; 0</Property>
+        </Properties>
+        <Exit Name="True" Type="Primary" NextID="40" />
+        <Exit Name="False" Type="Alternate" NextID="39" />
+      </Step>
+      <Step Type="Assign" Name="TimeOfNextValue" ID="39">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.TimeOfNextValue</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.Resource.Worker.CurrentWorkSchedule.TimeOfNextValue( CheckToken.TimeOfNextValue ) </Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="40" />
+      </Step>
+      <Step Type="Assign" Name="EventDelayTime" ID="40">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>CheckToken.EventDelayTime</Value>
+          </Property>
+          <Property Name="NewValue">CheckToken.TimeOfNextValue - TimeNow</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="13" />
+      </Step>
+    </Steps>
+  </Process>
+  <Process Name="TankFillProduceFinishedTask" BeginStepID="2" Category="Tanks">
+    <Properties />
+    <Steps>
+      <Step Type="Assign" Name="MixingOrderId" ID="2">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>MixingOrderId</Value>
+          </Property>
+          <Property Name="NewValue">ManufacturingOrders.OrderId</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="3" />
+      </Step>
+      <Step Type="Fire" Name="ReleaseMixing" ID="3">
+        <Properties>
+          <Property Name="EventName">ReleaseMixing</Property>
+        </Properties>
+      </Step>
+    </Steps>
+  </Process>
+  <Process Name="WaitForTankRelease" BeginStepID="5" Category="Tanks">
+    <Properties>
+      <Property Name="TokenClassName">WaitToken</Property>
+    </Properties>
+    <Steps>
+      <Step Type="Wait" Name="TankRelease" ID="2">
+        <Properties>
+          <Property Name="EventName">TankRelease</Property>
+          <Property Name="EventCondition">ManufacturingOrders.OrderId == TankReleaseOrderId</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="3" />
+      </Step>
+      <Step Type="Search" Name="SeziedResource" ID="3">
+        <Properties>
+          <Property Name="CollectionType">SeizedResources</Property>
+          <Property Name="EntityType">ManufacturingOrderEntity</Property>
+          <Property Name="OwnerType">SpecificObject</Property>
+          <Property Name="OwnerObject">
+            <Value>WaitToken.ModelEntity</Value>
+          </Property>
+          <Property Name="MatchCondition">Candidate.Object.Is.Tanks</Property>
+        </Properties>
+        <Exit Name="Found" Type="Alternate" NextID="4" />
+      </Step>
+      <Step Type="Release" Name="Tanks" ID="4">
+        <Properties>
+          <Property Name="OwnerType">SpecificObject</Property>
+          <Property Name="OwnerObject">
+            <Value>WaitToken.ModelEntity</Value>
+          </Property>
+          <Property Name="ResourceReleases">
+            <Rows>
+              <Properties>
+                <Property Name="ObjectName">Object</Property>
+              </Properties>
+            </Rows>
+          </Property>
+        </Properties>
+      </Step>
+      <Step Type="Assign" Name="ModelEntity" ID="5">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>WaitToken.ModelEntity</Value>
+          </Property>
+          <Property Name="NewValue">ModelEntity</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="2" />
+      </Step>
+    </Steps>
+  </Process>
+  <Process Name="Workers_Available" BeginStepID="3" Category="Workers">
+    <Properties />
+    <Steps>
+      <Step Type="Fire" Name="TriggerRoutingGroup" ID="2">
+        <Properties>
+          <Property Name="EventName">TriggerRoutingGroup</Property>
+        </Properties>
+      </Step>
+      <Step Type="Assign" Name="CurrentEquipmentGroup" ID="3">
+        <Properties>
+          <Property Name="StateVariableName">
+            <Value>StartingTransferNode</Value>
+          </Property>
+          <Property Name="NewValue">Nothing</Property>
+        </Properties>
+        <Exit Name="Exit" Type="Primary" NextID="2" />
+      </Step>
+    </Steps>
+  </Process>
+</Processes>
