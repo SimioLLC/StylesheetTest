@@ -41,7 +41,7 @@
             // treeView1
             // 
             this.treeView1.Location = new System.Drawing.Point(4, 20);
-            this.treeView1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.treeView1.Margin = new System.Windows.Forms.Padding(4);
             this.treeView1.Name = "treeView1";
             this.treeView1.Size = new System.Drawing.Size(1281, 591);
             this.treeView1.TabIndex = 0;
@@ -53,9 +53,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.treeView1);
             this.groupBox1.Location = new System.Drawing.Point(16, 15);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox1.Size = new System.Drawing.Size(1291, 615);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
@@ -65,7 +65,7 @@
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.button1.Location = new System.Drawing.Point(1095, 638);
-            this.button1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button1.Margin = new System.Windows.Forms.Padding(4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(100, 28);
             this.button1.TabIndex = 13;
@@ -77,7 +77,7 @@
             // 
             this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.button2.Location = new System.Drawing.Point(987, 638);
-            this.button2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button2.Margin = new System.Windows.Forms.Padding(4);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(100, 28);
             this.button2.TabIndex = 14;
@@ -90,7 +90,7 @@
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.cancelButton.Location = new System.Drawing.Point(1203, 638);
-            this.cancelButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cancelButton.Margin = new System.Windows.Forms.Padding(4);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(100, 28);
             this.cancelButton.TabIndex = 12;
@@ -101,7 +101,7 @@
             // 
             this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.button3.Location = new System.Drawing.Point(879, 638);
-            this.button3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button3.Margin = new System.Windows.Forms.Padding(4);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(100, 28);
             this.button3.TabIndex = 15;
@@ -112,8 +112,10 @@
             // rootNodesOnly
             // 
             this.rootNodesOnly.AutoSize = true;
+            this.rootNodesOnly.Checked = true;
+            this.rootNodesOnly.CheckState = System.Windows.Forms.CheckState.Checked;
             this.rootNodesOnly.Location = new System.Drawing.Point(728, 642);
-            this.rootNodesOnly.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.rootNodesOnly.Margin = new System.Windows.Forms.Padding(4);
             this.rootNodesOnly.Name = "rootNodesOnly";
             this.rootNodesOnly.Size = new System.Drawing.Size(132, 20);
             this.rootNodesOnly.TabIndex = 16;
@@ -132,7 +134,7 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.groupBox1);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.MinimizeBox = false;
             this.Name = "ViewTree";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
