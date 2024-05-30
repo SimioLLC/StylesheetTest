@@ -116,7 +116,7 @@
             // stylesheetFileNameBrowseButton
             // 
             this.stylesheetFileNameBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.stylesheetFileNameBrowseButton.Location = new System.Drawing.Point(740, 299);
+            this.stylesheetFileNameBrowseButton.Location = new System.Drawing.Point(599, 299);
             this.stylesheetFileNameBrowseButton.Margin = new System.Windows.Forms.Padding(4);
             this.stylesheetFileNameBrowseButton.Name = "stylesheetFileNameBrowseButton";
             this.stylesheetFileNameBrowseButton.Size = new System.Drawing.Size(145, 28);
@@ -154,7 +154,7 @@
             // saveStylesheet
             // 
             this.saveStylesheet.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.saveStylesheet.Location = new System.Drawing.Point(893, 299);
+            this.saveStylesheet.Location = new System.Drawing.Point(884, 299);
             this.saveStylesheet.Margin = new System.Windows.Forms.Padding(4);
             this.saveStylesheet.Name = "saveStylesheet";
             this.saveStylesheet.Size = new System.Drawing.Size(134, 28);
